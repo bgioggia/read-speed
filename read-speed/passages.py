@@ -1,9 +1,9 @@
 import random
 
-# word_count, passage
+
 class Passages:
 
-    # passages is a list of (word_count: int, passage: string)
+    # passages is a list of (passage: string)
     def __init__(self):
         self.passages = self.generate_passages()
 
@@ -23,15 +23,14 @@ class Passages:
      hard coded for now but will make this prettier eventually
     """
     def generate_passages(self):
-        passages = [
-            (118, '\nIt was the best of times, it was the worst of times, it was the age of wisdom, \n'
+        passages = [('\nIt was the best of times, it was the worst of times, it was the age of wisdom, \n'
               'it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, \n'
               'it was the season of Light, it was the season of Darkness, it was the spring of hope, \n'
               'it was the winter of despair, we had everything before us, we had nothing before us, \n'
               'we were all going direct to Heaven, we were all going direct the other way—in short, \n'
               'the period was so far like the present period, that some of its noisiest authorities \n'
               'insisted on its being received, for good or for evil, in the superlative degree of comparison only.\n'),
-            (121, "\nAccording to all known laws of aviation, there is no way a bee should be able to fly. "
+            ("\nAccording to all known laws of aviation, there is no way a bee should be able to fly. "
              "\nIts wings are too small to get its fat little body off the ground. "
              "\nThe bee, of course, flies anyway because bees don't care what humans think is impossible. "
              "\nYellow, black. Yellow, black. \nYellow, black. Yellow, black. \nOoh, black and yellow. "
@@ -40,7 +39,7 @@ class Passages:
              "\n- I can't. I'll pick you up. \nLooking sharp. Use the stairs. "
              "Your father paid good money for those. \nSorry. I'm excited. \nHere's the graduate. "
              "\nWe're very proud of you, son. A perfect report card, all B's. \nVery proud.\n"),
-            (76, '\nI AM SAM. I AM SAM. SAM I AM. '
+            ('\nI AM SAM. I AM SAM. SAM I AM. '
               '\nTHAT SAM-I-AM! THAT SAM-I-AM! '
               '\nI DO NOT LIKE THAT SAM-I-AM! '
               '\nDO WOULD YOU LIKE GREEN EGGS AND HAM? '
