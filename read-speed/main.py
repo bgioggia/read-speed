@@ -2,6 +2,7 @@ import time
 import passages
 
 
+
 """
 words:str -> word_count:int
 """
@@ -33,17 +34,13 @@ def getReadSpeed(words: str):
 
     return wpm
 
-
-
-
-if __name__ == '__main__':
+def terminal_logic():
     answer = ''
     avg_wpm = 0
 
     while(answer != 'y' and answer != 'n'):
         print('Do you know your reading speed? (y/n)')
         answer = input().lower()
-        print(answer)
 
     if answer == 'y':
         print('please enter your reading speed in wpm.')
@@ -67,7 +64,11 @@ if __name__ == '__main__':
 
         avg_wpm = sum(wpms) / len(wpms)
 
-        # rounds the wpm to one decimal place
-        print('your reading speed is ' + str(round(avg_wpm, 1)) + ' words per minute.')
+    # rounds the wpm to one decimal place
+    print('your reading speed is ' + str(round(avg_wpm, 1)) + ' words per minute.')
+
+
+if __name__ == '__main__':
+    terminal_logic()
 
 
