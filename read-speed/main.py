@@ -1,7 +1,6 @@
 import time
 import passages
-
-
+import scraper
 
 """
 words:str -> word_count:int
@@ -34,7 +33,7 @@ def getReadSpeed(words: str):
 
     return wpm
 
-def terminal_logic():
+def get_avg_wpm_through_terminal():
     answer = ''
     avg_wpm = 0
 
@@ -66,9 +65,37 @@ def terminal_logic():
 
     # rounds the wpm to one decimal place
     print('your reading speed is ' + str(round(avg_wpm, 1)) + ' words per minute.')
+    return avg_wpm
+
+"""
+void -> article:string
+"""
+def get_article_through_terminal():
+    print('Please enter the link to the article you would like to read.')
+    url = input()
+    html_body = scraper.get_htmll(url)
+    article = scraper.find_article_body(html_body)
+    return article
+"""
+article:str, wpm:float -> time_to_read:str
+"""
+def determine_time_to_read(article, wpm):
+    word_count = getWordCount(article)
+    print(word_count)
+    mins = word_count // wpm
+    secs = (word_count - (mins * wpm)) / (wpm / 60)
+
+    return str(int(mins)) + ' minutes and ' + str(int(secs)) + ' seconds.'
+
+
 
 
 if __name__ == '__main__':
-    terminal_logic()
+    wpm = get_avg_wpm_through_terminal()
+    article = get_article_through_terminal()
+
+    #wpm = terminal_logic()
+    print('It will take you ' + determine_time_to_read(article, wpm) + ' to read the desired text')
+    # terminal_logic()
 
 
