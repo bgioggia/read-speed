@@ -8,6 +8,11 @@
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+let global_passages = [];
+let global_passage_pointer = 0;
+let global_timestamp = 0;
+
+
 /**
  * Returns the element assocaited with an ID
  *
@@ -27,7 +32,7 @@ function noButton(){
         'Each passage should take between 10 and 45 seconds to read.\n' +
         'The more passages you read, the more accurate your measured WPM will be.')
 
-    var q = $$('question')
+    let q = $$('question')
     q.innerText = new_question;
 
     //Remove yes and no buttons
@@ -50,10 +55,60 @@ function noButton(){
  */
 function confirmNumberOfPassages(){
     let selection = $$('selection').value;
-    let passages = shuffle(generate_passages(selection));
-    console.log(passages);
+    global_passages = shuffle(generate_passages(selection));
+
+    const new_question = ('Passage #' + (global_passage_pointer + 1) + ':\n' +
+        'Please press the "Start Reading" button when you are ready to start reading.\n' +
+        'Press the button again when you have finished.')
+
+    var q = $$('question')
+    q.innerText = new_question;
+
+    //Remove confirm button and selection range.
+    $$('confirm_button').remove();
+    $$('selection').remove();
+
+    let stb = makeStartReadingButton()
+    q.after(stb);
 }
 
+/**
+ * handles the start reading button being pressed
+ */
+function handleStartReading() {
+    var q = $$('question')
+
+    q.innerText = global_passages[global_passage_pointer];
+
+    $$('start_reading_button').remove();
+
+    let stb = makeStopReadingButton();
+    q.after(stb);
+}
+
+/**
+ * handles all passages being read, and calculate WPM
+ */
+function handleCalculateWPM() {
+
+}
+
+
+/**
+ * handles the done reading button being pressed
+ */
+function handleDoneReading() {
+    var q = $$('question')
+
+    q.innerText = ('Passage #' + (global_passage_pointer + 1) + ':\n' +
+        'Please press the "Start Reading" button when you are ready to start reading.\n' +
+        'Press the button again when you have finished.')
+
+    $$('stop_reading_button').remove();
+
+    let stb = makeStartReadingButton();
+    q.after(stb);
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,6 +166,34 @@ function makeConfirmButton(){
     confirm.setAttribute('id', 'confirm_button')
     confirm.setAttribute('onclick', 'confirmNumberOfPassages()')
     confirm.innerText = "Confirm";
+    return confirm
+}
+
+
+/**
+ *  creates a start reading button
+ *
+ * @returns {HTMLButtonElement}
+ */
+function makeStartReadingButton(){
+    var confirm = document.createElement('button');
+    confirm.setAttribute('id', 'start_reading_button')
+    confirm.setAttribute('onclick', 'handleStartReading()')
+    confirm.innerText = "Start Reading";
+    return confirm
+}
+
+
+/**
+ * makes a stop reading button
+ *
+ * @returns {HTMLButtonElement}
+ */
+function makeStopReadingButton(){
+    var confirm = document.createElement('button');
+    confirm.setAttribute('id', 'stop_reading_button')
+    confirm.setAttribute('onclick', 'handleDoneReading()')
+    confirm.innerText = "Finished Reading";
     return confirm
 }
 
