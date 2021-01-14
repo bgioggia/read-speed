@@ -50,7 +50,7 @@ function noButton(){
  */
 function confirmNumberOfPassages(){
     let selection = $$('selection').value;
-    let passages = generate_passages(selection);
+    let passages = shuffle(generate_passages(selection));
     console.log(passages);
 }
 
@@ -149,10 +149,40 @@ function generate_passages(num_passages) {
     '\nI DO NOT LIKE GREEN EGGS AND HAM. ' +
     '\nI DO NOT LIKE THEM, SAM-I-AM.\n'),]
 
-    passages.sort(() => 0.5 - Math.random());
-    return passages.slice(0, num_passages);
+    let lst = shuffle(passages)
+
+    return lst.slice(0, num_passages);
 }
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ *
+ *                       UTIL
+ *
+ *
+ */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Fisher-Yates shuffle from https://github.com/coolaj86/knuth-shuffle
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
 
 
