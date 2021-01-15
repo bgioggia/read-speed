@@ -11,7 +11,7 @@
 let global_passages = [];
 let global_passage_pointer = 0;
 let global_timestamp = 0;
-
+let global_reading_times = [];
 
 /**
  * Returns the element assocaited with an ID
@@ -20,7 +20,7 @@ let global_timestamp = 0;
  * @returns {HTMLElement} is the HTML element associated with that ID
  */
 function $$(element) {
-    return document.getElementById(element)
+    return document.getElementById(element);
 }
 
 /**
@@ -40,10 +40,10 @@ function noButton(){
     $$('no').remove();
 
     //Create input box
-    var text_num = makeSelectionRange('1', '5');
+    let text_num = makeSelectionRange('1', '5');
 
     //Create confirm button
-    var confirm = makeConfirmButton()
+    let confirm = makeConfirmButton();
 
     q.after(text_num);
     text_num.after(confirm);
@@ -61,7 +61,7 @@ function confirmNumberOfPassages(){
         'Please press the "Start Reading" button when you are ready to start reading.\n' +
         'Press the button again when you have finished.')
 
-    var q = $$('question')
+    let q = $$('question')
     q.innerText = new_question;
 
     //Remove confirm button and selection range.
@@ -76,21 +76,22 @@ function confirmNumberOfPassages(){
  * handles the start reading button being pressed
  */
 function handleStartReading() {
-    var q = $$('question')
-
+    let q = $$('question')
     q.innerText = global_passages[global_passage_pointer];
 
     $$('start_reading_button').remove();
 
     let stb = makeStopReadingButton();
     q.after(stb);
+    global_passage_pointer += 1;
+    global_timestamp = new Date();
 }
 
 /**
  * handles all passages being read, and calculate WPM
  */
 function handleCalculateWPM() {
-
+console.log(global_reading_times)
 }
 
 
@@ -98,7 +99,8 @@ function handleCalculateWPM() {
  * handles the done reading button being pressed
  */
 function handleDoneReading() {
-    var q = $$('question')
+    let local_timestamp = new Date();
+    let q = $$('question')
 
     q.innerText = ('Passage #' + (global_passage_pointer + 1) + ':\n' +
         'Please press the "Start Reading" button when you are ready to start reading.\n' +
@@ -106,8 +108,18 @@ function handleDoneReading() {
 
     $$('stop_reading_button').remove();
 
-    let stb = makeStartReadingButton();
-    q.after(stb);
+    let dur = local_timestamp - global_timestamp;
+    console.log(dur)
+    global_reading_times.push(dur);
+
+    // if not end of list
+    if(global_passage_pointer < global_passages.length) {
+        let stb = makeStartReadingButton();
+        q.after(stb);
+    }
+    else {
+        handleCalculateWPM()
+    }
 }
 
 
@@ -148,7 +160,7 @@ function handleDoneReading() {
  * @returns {HTMLInputElement}
  */
 function makeSelectionRange(mn, mx){
-    var text_num = document.createElement('input');
+    let text_num = document.createElement('input');
     text_num.setAttribute('id', 'selection')
     text_num.setAttribute('type', 'number')
     text_num.setAttribute('min', '1')
@@ -162,7 +174,7 @@ function makeSelectionRange(mn, mx){
  * @returns {HTMLButtonElement}
  */
 function makeConfirmButton(){
-    var confirm = document.createElement('button');
+    let confirm = document.createElement('button');
     confirm.setAttribute('id', 'confirm_button')
     confirm.setAttribute('onclick', 'confirmNumberOfPassages()')
     confirm.innerText = "Confirm";
@@ -176,7 +188,7 @@ function makeConfirmButton(){
  * @returns {HTMLButtonElement}
  */
 function makeStartReadingButton(){
-    var confirm = document.createElement('button');
+    let confirm = document.createElement('button');
     confirm.setAttribute('id', 'start_reading_button')
     confirm.setAttribute('onclick', 'handleStartReading()')
     confirm.innerText = "Start Reading";
@@ -190,7 +202,7 @@ function makeStartReadingButton(){
  * @returns {HTMLButtonElement}
  */
 function makeStopReadingButton(){
-    var confirm = document.createElement('button');
+    let confirm = document.createElement('button');
     confirm.setAttribute('id', 'stop_reading_button')
     confirm.setAttribute('onclick', 'handleDoneReading()')
     confirm.innerText = "Finished Reading";
@@ -250,7 +262,7 @@ function generate_passages(num_passages) {
 
 // Fisher-Yates shuffle from https://github.com/coolaj86/knuth-shuffle
 function shuffle(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex;
+    let currentIndex = array.length, temporaryValue, randomIndex;
 
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
