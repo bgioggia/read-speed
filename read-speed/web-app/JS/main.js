@@ -91,7 +91,9 @@ function handleStartReading() {
  * handles all passages being read, and calculate WPM
  */
 function handleCalculateWPM() {
-console.log(global_reading_times)
+    const avg = calculateAverage(global_reading_times)
+    console.log(global_reading_times)
+    console.log(avg)
 }
 
 
@@ -278,6 +280,21 @@ function shuffle(array) {
     }
 
     return array;
+}
+
+/**
+ * Calculates average in an array of number values
+ *
+ * @param array of numbers
+ * @returns {number} average of all numbers in {array}
+ */
+function calculateAverage(array){
+    let sum = 0
+    for(let i = 0; i < array.length; i++) {
+        sum += array[i];
+    }
+
+    return sum / array.length
 }
 
 
