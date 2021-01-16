@@ -221,21 +221,23 @@ function handleLinkSubmitButtonPressed(){
             url: '/_get_read_time/',
             data: JSON.stringify({ 'link': link, 'wpm' : wpm}) ,
             type: 'POST',
+            async: false,
             dataType : 'json',
             contentType: 'application/json; charset=utf-8',
             success: function(response) {
-                if ($$('time_to_read') != null){
+                if ($$('time_to_read') != null) {
                     $$('time_to_read').remove();
                 }
-                let time_to_read = response;
+                let time_to_read = response['data'];
                 let q = $$('question');
                 let ttr = document.createElement('h1')
                 ttr.setAttribute('id', 'time_to_read')
-                ttr.innerText = 'The linked article will take you ' + time_to_read['data'] + ' to read.'
-                q.after(ttr)
+                ttr.innerText = 'The linked article will take you ' + time_to_read + ' to read.'
+                q.after(ttr);
             },
             error: function(error) {
-                console.log(error);
+                alert("There was an issue reaching your link! Please make sure it is the full url starting with " +
+                    "https:// or http://. If you continue having problems copying and pasting the text.");
             }
         });
     });
@@ -337,17 +339,6 @@ function calculateTimeToRead(article, wpm) {
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-$(function() {
-    $('a#link_button_wrapper').on('click', function(e) {
-        e.preventDefault()
-        $.post('/_get_read_time/',
-            function(data) {
-                //do nothing
-            });
-        return false;
-    });
-});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
