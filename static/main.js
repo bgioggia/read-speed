@@ -202,21 +202,16 @@ function handlePasteButtonPressed() {
  * When link button is pressed, creates an input for link to be entered.
  */
 function handleLinkButtonPressed(){
-    console.log('link')
-
-    const http = require('http');
-    const PORT = 3000;
-
-    const server = http.createServer((req, res) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        res.end('Hello World');
+    $(function() {
+        $('a#link_button_wrapper').on('click', function(e) {
+            e.preventDefault()
+            $.post('/_get_read_time/',
+                function(data) {
+                    console.log(data)
+                });
+            return false;
+        });
     });
-
-    server.listen(port, () => {
-        console.log(`Server running at PORT:${port}/`);
-    });
-
 }
 
 /**
@@ -285,6 +280,18 @@ function calculateTimeToRead(article, wpm) {
  *
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+$(function() {
+    $('a#link_button_wrapper').on('click', function(e) {
+        e.preventDefault()
+        $.post('/_get_read_time/',
+            function(data) {
+                //do nothing
+            });
+        return false;
+    });
+});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -370,11 +377,16 @@ function makeStopReadingButton(){
  * @returns {HTMLButtonElement}
  */
 function makeLinkButton(){
+    let anch = document.createElement('a')
+    anch.setAttribute('href', '#');
+    anch.setAttribute('id', 'link_button_wrapper')
+
     let lnk = document.createElement('button');
     lnk.setAttribute('id', 'link_button')
     lnk.setAttribute('onclick', 'handleLinkButtonPressed()')
     lnk.innerText = "I have a link.";
-    return lnk
+    anch.appendChild(lnk);
+    return anch
 }
 
 /**

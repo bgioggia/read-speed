@@ -90,8 +90,6 @@ def determine_time_to_read(article, wpm):
     return str(int(mins)) + ' minutes and ' + str(int(secs)) + ' seconds.'
 
 
-#app = Flask(__name__, static_folder='/static/')  #os.path.abspath('/static'))
-
 app = Flask (__name__)
 
 @app.route('/')
@@ -103,7 +101,11 @@ def _get_read_time():
     html_body = scraper.get_htmll("https://www.reuters.com/article/us-tesla-safety/u-s-asks-tesla-to-recall-158000-vehicles-for-touchscreen-failures-idUSKBN29I35K?utm_source=reddit.com")
     article = scraper.find_article_body(html_body)
     ret_string = determine_time_to_read(article, 233)
-    return jsonify({'data: '+ret_string})
+    #response = jsonify({'data: '+ ret_string})
+    response = jsonify(data=ret_string)
+    response.status_code = 200
+    return response
+    #return make_response(jsonify({'data: '+ ret_string}), 200)
 
 if __name__ == '__main__':
     app.run(debug=True)
