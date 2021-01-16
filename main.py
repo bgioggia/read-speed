@@ -87,7 +87,7 @@ def determine_time_to_read(article, wpm):
     mins = word_count // wpm
     secs = (word_count - (mins * wpm)) / (wpm / 60)
 
-    return str(int(mins)) + ' minutes and ' + str(int(secs)) + ' seconds.'
+    return str(int(mins)) + ' minutes and ' + str(int(secs)) + ' seconds'
 
 
 app = Flask (__name__)

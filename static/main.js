@@ -188,7 +188,18 @@ function handlePasteButtonPressed() {
     q.innerText = 'Your average reading speed is ' + (parseFloat(global_wpm)).toFixed(1) +
         ' words per minute.\nPaste the text you would like to read below and press calculate.\n' +
         'If you also have a link, press the corresponding button to enter it.'
-    $$('link_button').remove();
+    if ($$('link_button') != null){
+        $$('link_button').remove();
+    }
+    if ($$('link_input') != null){
+        $$('link_input').remove();
+    }
+    if ($$('link_submit_button') != null){
+    $$('link_submit_button').remove();
+    }
+    if ($$('time_to_read') != null){
+        $$('time_to_read').remove();
+    }
     $$('paste_button').remove();
     let paste_box = makePasteBox();
     let calculate_button = makeCalculatePastedButton();
@@ -198,12 +209,13 @@ function handlePasteButtonPressed() {
     calculate_button.after(link_button)
 }
 
+
 /**
- * When link button is pressed, creates an input for link to be entered.
+ * Submits a link and calls python script to evaluate read-time of it.
  */
-function handleLinkButtonPressed(){
-    let wpm = '233'
-    let link = "https://www.reuters.com/article/us-tesla-safety/u-s-asks-tesla-to-recall-158000-vehicles-for-touchscreen-failures-idUSKBN29I35K?utm_source=reddit.com"
+function handleLinkSubmitButtonPressed(){
+    let wpm = global_wpm
+    let link = $$('link_input').value;
     $(function() {
       $.ajax({
             url: '/_get_read_time/',
@@ -212,7 +224,15 @@ function handleLinkButtonPressed(){
             dataType : 'json',
             contentType: 'application/json; charset=utf-8',
             success: function(response) {
-                console.log(response);
+                if ($$('time_to_read') != null){
+                    $$('time_to_read').remove();
+                }
+                let time_to_read = response;
+                let q = $$('question');
+                let ttr = document.createElement('h1')
+                ttr.setAttribute('id', 'time_to_read')
+                ttr.innerText = 'The linked article will take you ' + time_to_read['data'] + ' to read.'
+                q.after(ttr)
             },
             error: function(error) {
                 console.log(error);
@@ -222,19 +242,32 @@ function handleLinkButtonPressed(){
 }
 
 /**
- * Submits a link and calls python script to evaluate read-time of it.
+ * When link button is pressed, creates an input for link to be entered.
  */
-function handleLinkSubmitButtonPressed(){
-    $(function() {
-        $('a#link_button_wrapper').on('click', function(e) {
-            e.preventDefault()
-            $.post('/_get_read_time/',
-                function(data) {
-                    console.log(data)
-                });
-            return false;
-        });
-    });
+function handleLinkButtonPressed(){
+    let q = $$('question');
+    q.innerText = 'Your average reading speed is ' + (parseFloat(global_wpm)).toFixed(1) +
+        ' words per minute.\nPaste the link to the article you would like to read below and press submit.\n' +
+        'If you also have text to paste, press the corresponding button to enter it.'
+    $$('link_button').remove();
+    if ($$('paste_button') != null){
+        $$('paste_button').remove();
+    }
+    if ($$('paste_box') != null){
+        $$('paste_box').remove();
+    }
+    if ($$('calculate_pasted_button') != null){
+        $$('calculate_pasted_button').remove();
+    }
+    if ($$('time_to_read') != null){
+        $$('time_to_read').remove();
+    }
+    let link_input = makeLinkInput();
+    let submit_button = makeSubmitLinkButton();
+    let paste_button = makePasteButton();
+    q.after(link_input);
+    link_input.after(submit_button);
+    submit_button.after(paste_button)
 }
 
 /**
@@ -354,6 +387,13 @@ function makeConfirmButton(){
     return confirm
 }
 
+
+function makeLinkInput() {
+    let link_input = document.createElement('input');
+    link_input.setAttribute('id', 'link_input');
+    return link_input;
+}
+
 /**
  * creates an enter button to be used for entering WPM
  * @returns {HTMLButtonElement}
@@ -395,23 +435,38 @@ function makeStopReadingButton(){
 }
 
 /**
+ * make a submit link button
+ *
+ * @returns {HTMLAnchorElement}
+ */
+function makeSubmitLinkButton() {
+    let anch = document.createElement('a')
+    anch.setAttribute('href', '#');
+    anch.setAttribute('id', 'link_button_wrapper')
+    anch.setAttribute('onclick', 'handleLinkSubmitButtonPressed()')
+
+    let lnk = document.createElement('button');
+    lnk.setAttribute('id', 'link_submit_button')
+    lnk.setAttribute('onclick', 'handleLinkSubmitButtonPressed()')
+    lnk.innerText = "Submit";
+    anch.appendChild(lnk);
+    return anch
+}
+
+
+/**
  * make a link button
  *
  * @returns {HTMLButtonElement}
  */
 function makeLinkButton(){
-    let anch = document.createElement('a')
-    anch.setAttribute('href', '#');
-    anch.setAttribute('id', 'link_button_wrapper')
-    anch.setAttribute('onclick', 'handleLinkButtonPressed()')
-
     let lnk = document.createElement('button');
     lnk.setAttribute('id', 'link_button')
     lnk.setAttribute('onclick', 'handleLinkButtonPressed()')
     lnk.innerText = "I have a link.";
-    anch.appendChild(lnk);
-    return anch
+    return lnk
 }
+
 
 /**
  * make a paste button
