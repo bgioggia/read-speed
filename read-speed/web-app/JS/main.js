@@ -7,11 +7,11 @@
  *
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 let global_passages = [];
 let global_passage_pointer = 0;
 let global_timestamp = 0;
-let global_reading_times = [];
+let global_wpms = [];
+let global_wpm = 0;
 
 /**
  * Returns the element assocaited with an ID
@@ -22,6 +22,48 @@ let global_reading_times = [];
 function $$(element) {
     return document.getElementById(element);
 }
+
+/**
+ * If the yes button is pressed, remove buttons and prompt user for their reading speed in WPM
+ */
+function yesButton(){
+
+    let q = $$('question')
+    q.innerText = 'Please enter your reading speed in words per minute.';
+
+    //Remove yes and no buttons
+    $$('yes').remove();
+    $$('no').remove();
+
+    //Create input box
+    let text_num = makeSelectionRange('1', '1000');
+
+    //Create confirm button
+    let confirm = makeEnterButton();
+
+    q.after(text_num);
+    text_num.after(confirm);
+
+
+}
+
+/**
+ * if the the enter button has been pressed,
+ */
+function handleEnterButtonPressed(){
+
+    let wpm = $$('selection').value
+    if (wpm < 1) {
+        wpm = 1
+    }
+    if (wpm > 10000) {
+        wpm = 9999
+    }
+    $$('selection').remove()
+    $$('enter_button').remove()
+    handleCalculateWPM(wpm)
+}
+
 
 /**
  * If the no button is pressed, remove buttons and prompt user for number of passages
@@ -90,10 +132,17 @@ function handleStartReading() {
 /**
  * handles all passages being read, and calculate WPM
  */
-function handleCalculateWPM() {
-    const avg = calculateAverage(global_reading_times)
-    console.log(global_reading_times)
-    console.log(avg)
+function handleCalculateWPM(wpm) {
+    global_wpm = wpm;
+    let q = $$('question')
+    q.innerText = 'Your average reading speed is ' + (parseFloat(wpm)).toFixed(1) + ' words per minute.\n' +
+        'Would you like to know the time it will take you to read an article that you have the link to, ' +
+        'or would you rather paste your text directly?';
+    let lnk_button = makeLinkButton();
+    let pst_button = makePasteButton();
+
+    q.after(lnk_button);
+    lnk_button.after(pst_button);
 }
 
 
@@ -104,26 +153,91 @@ function handleDoneReading() {
     let local_timestamp = new Date();
     let q = $$('question')
 
-    q.innerText = ('Passage #' + (global_passage_pointer + 1) + ':\n' +
-        'Please press the "Start Reading" button when you are ready to start reading.\n' +
-        'Press the button again when you have finished.')
-
     $$('stop_reading_button').remove();
 
-    let dur = local_timestamp - global_timestamp;
-    console.log(dur)
-    global_reading_times.push(dur);
+    let milliseconds_to_read = local_timestamp - global_timestamp;
+    console.log(milliseconds_to_read);
+
+    let word_count = getWordCount(q.innerText);
+    let wps = word_count / (milliseconds_to_read / 1000)
+    let wpm = wps * 60;
+    console.log(wpm)
+
+    global_wpms.push(wpm);
 
     // if not end of list
     if(global_passage_pointer < global_passages.length) {
+        q.innerText = ('Passage #' + (global_passage_pointer + 1) + ':\n' +
+            'Please press the "Start Reading" button when you are ready to start reading.\n' +
+            'Press the button again when you have finished.')
         let stb = makeStartReadingButton();
         q.after(stb);
     }
     else {
-        handleCalculateWPM()
+        const avg = calculateAverage(global_wpms)
+        handleCalculateWPM(avg)
     }
 }
 
+/**
+ * When the Paste button is pressed, creates a textbot and sets the page up for a
+ * block of text to be pasted.
+ */
+function handlePasteButtonPressed() {
+    let q = $$('question');
+    q.innerText = 'Your average reading speed is ' + (parseFloat(global_wpm)).toFixed(1) +
+        ' words per minute.\nPaste the text you would like to read below and press calculate.\n' +
+        'If you also have a link, press the corresponding button to enter it.'
+    $$('link_button').remove();
+    $$('paste_button').remove();
+    let paste_box = makePasteBox();
+    let calculate_button = makeCalculatePastedButton();
+    let link_button = makeLinkButton();
+    q.after(paste_box);
+    paste_box.after(calculate_button);
+    calculate_button.after(link_button)
+}
+
+/**
+ * When link button is pressed, creates an input for link to be entered.
+ */
+function handleLinkButtonPressed(){
+    console.log('link')
+
+    const http = require('http');
+    const PORT = 3000;
+
+    const server = http.createServer((req, res) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/plain');
+        res.end('Hello World');
+    });
+
+    server.listen(port, () => {
+        console.log(`Server running at PORT:${port}/`);
+    });
+
+}
+
+/**
+ * Handles calculation of read speed when button is pressed for
+ * text in textbox.
+ */
+function handleCalculatePastedButtonPressed() {
+    let text_box = $$('paste_box');
+    let q = $$('question');
+    let time_to_read = calculateTimeToRead(text_box.value, global_wpm);
+
+    if($$('time_to_read') != null){
+        $$('time_to_read').remove()
+    }
+
+    let ttr = document.createElement('h1')
+    ttr.setAttribute('id', 'time_to_read')
+    ttr.innerText = 'The pasted text will take you ' + time_to_read + ' to read.'
+
+    q.after(ttr)
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -135,6 +249,33 @@ function handleDoneReading() {
  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Gets the number of words separated by spaces in a list.
+ *
+ * @param words is a string of words separated by spaces
+ * @returns {number} of words separated by spaces in a string
+ */
+function getWordCount(words) {
+    return words.split(' ').length
+}
+
+/**
+ * Calculates the time to read an article given a wpm speed. Assumes all words
+ * are separated by spaces. Returns time to read embedded in a string.
+ *
+ * @param article is a string of words separated by spaces.
+ * @param wpm is float representing the reading speed.
+ * @returns {string} containing minutes and seconds to read.
+ */
+function calculateTimeToRead(article, wpm) {
+    let word_count = getWordCount(article);
+    let wps = wpm / 60;
+    let total_seconds = word_count / wps;
+    console.log(total_seconds);
+    let secs = total_seconds % 60;
+    let mins = (total_seconds - secs) / 60;
+    return (mins + ' minutes and ' + secs.toFixed(1)+ ' seconds')
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
@@ -183,6 +324,18 @@ function makeConfirmButton(){
     return confirm
 }
 
+/**
+ * creates an enter button to be used for entering WPM
+ * @returns {HTMLButtonElement}
+ */
+function makeEnterButton(){
+    let enter = document.createElement('button');
+    enter.setAttribute('id', 'enter_button')
+    enter.setAttribute('onclick', 'handleEnterButtonPressed()')
+    enter.innerText = "Enter";
+    return enter
+}
+
 
 /**
  *  creates a start reading button
@@ -209,6 +362,57 @@ function makeStopReadingButton(){
     confirm.setAttribute('onclick', 'handleDoneReading()')
     confirm.innerText = "Finished Reading";
     return confirm
+}
+
+/**
+ * make a link button
+ *
+ * @returns {HTMLButtonElement}
+ */
+function makeLinkButton(){
+    let lnk = document.createElement('button');
+    lnk.setAttribute('id', 'link_button')
+    lnk.setAttribute('onclick', 'handleLinkButtonPressed()')
+    lnk.innerText = "I have a link.";
+    return lnk
+}
+
+/**
+ * make a paste button
+ *
+ * @returns {HTMLButtonElement}
+ */
+function makePasteButton(){
+    let pst = document.createElement('button');
+    pst.setAttribute('id', 'paste_button')
+    pst.setAttribute('onclick', 'handlePasteButtonPressed()')
+    pst.innerText = "I will paste my text.";
+    return pst
+}
+
+/**
+ * make a text box for article to be pasted in
+ *
+ * @returns {HTMLTextAreaElement}
+ */
+function makePasteBox(){
+    let pst = document.createElement('textarea');
+    pst.setAttribute('id', 'paste_box')
+    //pst.innerText = "I will paste my text.";
+    return pst
+}
+
+/**
+ * make calculate pasted text button.
+ *
+ * @returns {HTMLButtonElement}
+ */
+function makeCalculatePastedButton() {
+    let calc = document.createElement('button');
+    calc.setAttribute('id', 'calculate_pasted_button');
+    calc.setAttribute('onclick', 'handleCalculatePastedButtonPressed()');
+    calc.innerText = "Calculate";
+    return calc;
 }
 
 /**
