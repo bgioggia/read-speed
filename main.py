@@ -2,7 +2,7 @@ import os
 import time
 import passages
 import scraper
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 
 """
 words:str -> word_count:int
@@ -98,14 +98,15 @@ def render_read_speed():
 
 @app.route('/_get_read_time/', methods=['POST'])
 def _get_read_time():
-    html_body = scraper.get_htmll("https://www.reuters.com/article/us-tesla-safety/u-s-asks-tesla-to-recall-158000-vehicles-for-touchscreen-failures-idUSKBN29I35K?utm_source=reddit.com")
+    clicked = request.get_json()
+    link = clicked['link']
+    wpm = float(clicked['wpm'])
+    html_body = scraper.get_htmll(link)
     article = scraper.find_article_body(html_body)
-    ret_string = determine_time_to_read(article, 233)
-    #response = jsonify({'data: '+ ret_string})
+    ret_string = determine_time_to_read(article, wpm)
     response = jsonify(data=ret_string)
     response.status_code = 200
     return response
-    #return make_response(jsonify({'data: '+ ret_string}), 200)
 
 if __name__ == '__main__':
     app.run(debug=True)

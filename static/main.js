@@ -202,6 +202,29 @@ function handlePasteButtonPressed() {
  * When link button is pressed, creates an input for link to be entered.
  */
 function handleLinkButtonPressed(){
+    let wpm = '233'
+    let link = "https://www.reuters.com/article/us-tesla-safety/u-s-asks-tesla-to-recall-158000-vehicles-for-touchscreen-failures-idUSKBN29I35K?utm_source=reddit.com"
+    $(function() {
+      $.ajax({
+            url: '/_get_read_time/',
+            data: JSON.stringify({ 'link': link, 'wpm' : wpm}) ,
+            type: 'POST',
+            dataType : 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+}
+
+/**
+ * Submits a link and calls python script to evaluate read-time of it.
+ */
+function handleLinkSubmitButtonPressed(){
     $(function() {
         $('a#link_button_wrapper').on('click', function(e) {
             e.preventDefault()
@@ -380,6 +403,7 @@ function makeLinkButton(){
     let anch = document.createElement('a')
     anch.setAttribute('href', '#');
     anch.setAttribute('id', 'link_button_wrapper')
+    anch.setAttribute('onclick', 'handleLinkButtonPressed()')
 
     let lnk = document.createElement('button');
     lnk.setAttribute('id', 'link_button')
