@@ -103,13 +103,14 @@ def _get_read_time():
     wpm = float(clicked['wpm'])
     html_body = scraper.get_htmll(link)
     article = scraper.find_article_body(html_body)
+    status_code = 200
     try:
         ret_string = determine_time_to_read(article, wpm)
-        response.status_code = 200
     except ValueError:
         ret_string = 'urlErr'
-        response.status_code = 404
+        status_code = 500
     response = jsonify(data=ret_string)
+    response.status_code = status_code
     return response
 
 if __name__ == '__main__':

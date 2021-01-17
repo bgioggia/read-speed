@@ -2,18 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Read-Speed</title>
+    <link href="{{ url_for('static', filename='BG.png') }}" rel="icon" >
+    <link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 
-<p id="question">
-    Do you know your reading speed?
-</p>
-<button id="yes" onclick="yesButton()">yes</button>
-<button id="no" onclick="noButton()">no</button>
+<div class="Banner">
+    <a href="https://www.brandongioggia.com">
+        <div class="Title" >
+            <h1> Brandon Gioggia</h1>
+        </div>
+    </a>
+</div>
+<div class="Banner">
+    <a href="#" onClick="function refresh(){window.location.reload();}refresh();">
+        <div class="Title2" >
+            <h1>Read Speed</h1>
+        </div>
+    </a>
+</div>
 
-<script src='{{url_for('static', filename='main.js')}}'></script>
+<div class="row">
+    <div class="column"></div>
+        <div class="main_column">
+        <h3 id="question">
+            Do you know your reading speed in words per minute?
+        </h3>
+        <button id="yes" onclick="yesButton()">yes</button>
+        <button id="no" onclick="noButton()">no</button>
 
+        <script src='{{url_for('static', filename='main.js')}}'></script>
+    </div>
+    <div class="column"></div>
+
+</div>
 </body>
 </html>
